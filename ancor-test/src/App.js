@@ -13,16 +13,17 @@ class App extends Component {
       newItemPrice: '',
       items: [
         {
-          title: 'title',
+          title: 'Телефон',
           price: 100,
         }, {
-          title: 'title',
+          title: 'Магнитофон',
           price: 200,
         }, {
-          title: 'title',
+          title: 'Миелофон',
           price: 400,
         }, 
       ],
+      newDiscount: 7,
       discount: 7
     };
 
@@ -39,13 +40,13 @@ class App extends Component {
 
   setNewItemPrice(event) {
     this.setState({
-      newItemPrice: event.target.value
+      newItemPrice: Number(event.target.value)
     })
   }
 
   changeDiscount(event) {
     this.setState({
-      discount: event.target.value
+      newDiscount: Number(event.target.value)
     })
   }
 
@@ -66,7 +67,15 @@ class App extends Component {
     })
   }
 
-  renderDiscount = (index) => {
+  submitDiscount = e => {
+    e.preventDefault();
+
+    this.setState({
+      discount: this.state.newDiscount
+    })
+  }
+
+  renderDiscount = index => {
     const { items, discount } = this.state;
     const { price } = items[index];
     const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
@@ -75,13 +84,14 @@ class App extends Component {
   }
 
   render() {
-    const { newItemTitle, newItemPrice, items, discount } = this.state;
+    const { state, submitDiscount, newDiscount, renderDiscount, handleSubmit, setNewItemTitle, setNewItemPrice, changeDiscount } = this;
+    const { newItemTitle, newItemPrice, items, discount } = state;
     const itemList = items.map((item, index) => {
       return (
         <tr key={index}>
           <td>{item.title}</td>
           <td>{item.price}</td>
-          <td>{this.renderDiscount(index)}</td>
+          <td>{renderDiscount(index)}</td>
         </tr>
       )
     })
@@ -94,7 +104,7 @@ class App extends Component {
             <div className="col">
               <h2 className="header">Добавить продукт</h2>
               <div className="form">
-                <form action="/" onSubmit={this.handleSubmit}>
+                <form action="/" onSubmit={handleSubmit}>
                   <div className="input-item _big">
                     <label>
                       <div className="input-item__label">Продукт</div>
@@ -102,7 +112,7 @@ class App extends Component {
                         <input 
                           type="text" 
                           value={newItemTitle}
-                          onChange={this.setNewItemTitle}
+                          onChange={setNewItemTitle}
                         />
                       </div>
                     </label>
@@ -114,7 +124,7 @@ class App extends Component {
                         <input 
                           type="text"
                           value={newItemPrice}
-                          onChange={this.setNewItemPrice}
+                          onChange={setNewItemPrice}
                         />
                       </div>
                     </label>
@@ -155,14 +165,14 @@ class App extends Component {
                   </table>
                 </div>
                 <div className="form">
-                  <form action="/">
+                  <form action="/" onSubmit={submitDiscount}>
                     <div className="input-item">
                       <label>
                         <span>Применить скидку</span>
                         <input 
                           type="text" 
-                          value={discount}
-                          onChange={this.changeDiscount}
+                          value={newDiscount}
+                          onChange={changeDiscount}
                         />
                         <span>рублей</span>
                         <button>Применить</button>
