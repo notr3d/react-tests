@@ -10,7 +10,7 @@ class App extends Component {
 
     this.state = {
       newItemTitle: '',
-      newItemPrice: '',
+      newItemPrice: 0,
       items: [
         {
           title: 'Телефон',
@@ -63,7 +63,7 @@ class App extends Component {
     this.setState({
       items,
       newItemTitle: '',
-      newItemPrice: ''
+      newItemPrice: 0
     })
   }
 
@@ -78,14 +78,15 @@ class App extends Component {
   renderDiscount = index => {
     const { items, discount } = this.state;
     const { price } = items[index];
+
     const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
-    return Math.round(discount / 100 * Math.round(price / totalPrice * 100))
+    return Math.round(discount / 100 * Math.floor(price / totalPrice * 100))
   }
 
   render() {
-    const { state, submitDiscount, newDiscount, renderDiscount, handleSubmit, setNewItemTitle, setNewItemPrice, changeDiscount } = this;
-    const { newItemTitle, newItemPrice, items, discount } = state;
+    const { state, submitDiscount, renderDiscount, handleSubmit, setNewItemTitle, setNewItemPrice, changeDiscount } = this;
+    const { newItemTitle, newItemPrice, newDiscount, items, discount } = state;
     const itemList = items.map((item, index) => {
       return (
         <tr key={index}>
