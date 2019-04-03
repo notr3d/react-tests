@@ -2,8 +2,67 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      newItemTitle: '',
+      newItemPrice: '',
+      items: [],
+      discount: 0
+    };
+
+    this.setNewItemTitle = this.setNewItemTitle.bind(this);
+    this.setNewItemPrice = this.setNewItemPrice.bind(this);
+  }
+
+  setNewItemTitle(event) {
+    this.setState({
+      newItemTitle: event.target.value
+    })
+  }
+
+  setNewItemPrice(event) {
+    this.setState({
+      newItemPrice: event.target.value
+    })
+  }
+
+  handleSubmit = e => {
+    e.preventDefault();
+
+    const { newItemTitle, newItemPrice, items } = this.state;
+
+    items.push({
+      title: newItemTitle,
+      price: newItemPrice
+    });
+
+    this.setState({
+      items,
+      newItemTitle: '',
+      newItemPrice: ''
+    })
+  }
+
   render() {
+    const { newItemTitle, newItemPrice, items, discount } = this.state;
+    
+    console.log(items)
+
+    const itemList = items.map((item, index) => {
+      return (
+        <tr key={index}>
+          <td>{item.title}</td>
+          <td>{item.price}</td>
+          <td>99</td>
+        </tr>
+      )
+    })
+
     return (
       <div className="app">
         <div className="calc">
@@ -12,12 +71,16 @@ class App extends Component {
             <div className="col">
               <h2 className="header">Добавить продукт</h2>
               <div className="form">
-                <form action="/">
+                <form action="/" onSubmit={this.handleSubmit}>
                   <div className="input-item _big">
                     <label>
                       <div className="input-item__label">Продукт</div>
                       <div className="input-item__wrapper">
-                        <input type="text"/>
+                        <input 
+                          type="text" 
+                          value={newItemTitle}
+                          onChange={this.setNewItemTitle}
+                        />
                       </div>
                     </label>
                   </div>
@@ -25,7 +88,11 @@ class App extends Component {
                     <label>
                       <div className="input-item__label">Цена</div>
                       <div className="input-item__wrapper">
-                        <input type="text"/>
+                        <input 
+                          type="text"
+                          value={newItemPrice}
+                          onChange={this.setNewItemPrice}
+                        />
                       </div>
                     </label>
                   </div>
@@ -60,16 +127,7 @@ class App extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Телефон</td>
-                        <td>100</td>
-                        <td>99</td>
-                      </tr>
-                      <tr>
-                        <td>Телефон</td>
-                        <td>100</td>
-                        <td>99</td>
-                      </tr>
+                      {itemList}
                     </tbody>
                   </table>
                 </div>
