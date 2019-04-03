@@ -11,12 +11,24 @@ class App extends Component {
     this.state = {
       newItemTitle: '',
       newItemPrice: '',
-      items: [],
-      discount: 0
+      items: [
+        {
+          title: 'title',
+          price: 100,
+        }, {
+          title: 'title',
+          price: 200,
+        }, {
+          title: 'title',
+          price: 400,
+        }, 
+      ],
+      discount: 7
     };
 
     this.setNewItemTitle = this.setNewItemTitle.bind(this);
     this.setNewItemPrice = this.setNewItemPrice.bind(this);
+    this.changeDiscount = this.changeDiscount.bind(this);
   }
 
   setNewItemTitle(event) {
@@ -28,6 +40,12 @@ class App extends Component {
   setNewItemPrice(event) {
     this.setState({
       newItemPrice: event.target.value
+    })
+  }
+
+  changeDiscount(event) {
+    this.setState({
+      discount: event.target.value
     })
   }
 
@@ -48,17 +66,22 @@ class App extends Component {
     })
   }
 
+  renderDiscount = (index) => {
+    const { items, discount } = this.state;
+    const { price } = items[index];
+    const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+
+    return Math.round(discount / 100 * Math.round(price / totalPrice * 100))
+  }
+
   render() {
     const { newItemTitle, newItemPrice, items, discount } = this.state;
-    
-    console.log(items)
-
     const itemList = items.map((item, index) => {
       return (
         <tr key={index}>
           <td>{item.title}</td>
           <td>{item.price}</td>
-          <td>99</td>
+          <td>{this.renderDiscount(index)}</td>
         </tr>
       )
     })
@@ -136,7 +159,11 @@ class App extends Component {
                     <div className="input-item">
                       <label>
                         <span>Применить скидку</span>
-                        <input type="text"/>
+                        <input 
+                          type="text" 
+                          value={discount}
+                          onChange={this.changeDiscount}
+                        />
                         <span>рублей</span>
                         <button>Применить</button>
                       </label>
