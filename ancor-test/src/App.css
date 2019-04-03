@@ -96,6 +96,6 @@ th {
   background: grey;
 }
 
-tr:nth-child(odd) td {
+tr:nth-child(even) td {
   background: lightgrey;
 }
