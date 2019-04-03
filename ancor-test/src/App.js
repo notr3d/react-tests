@@ -11,25 +11,16 @@ class App extends Component {
     this.state = {
       newItemTitle: '',
       newItemPrice: 0,
-      items: [
-        {
-          title: 'Телефон',
-          price: 100,
-        }, {
-          title: 'Магнитофон',
-          price: 200,
-        }, {
-          title: 'Миелофон',
-          price: 400,
-        }, 
-      ],
-      newDiscount: 7,
-      discount: 7
+
+      items: [],
+
+      newDiscount: 0,
+      discount: 0
     };
 
     this.setNewItemTitle = this.setNewItemTitle.bind(this);
     this.setNewItemPrice = this.setNewItemPrice.bind(this);
-    this.changeDiscount = this.changeDiscount.bind(this);
+    this.setDiscount = this.setDiscount.bind(this);
   }
 
   setNewItemTitle(event) {
@@ -48,7 +39,7 @@ class App extends Component {
     })
   }
 
-  changeDiscount(event) {
+  setDiscount(event) {
     const value = Number(event.target.value);
 
     if (isNaN(value)) return false;
@@ -83,11 +74,9 @@ class App extends Component {
     })
   }
 
-  renderDiscount = index => {
+  renderDiscount = (index, totalPrice) => {
     const { items, discount } = this.state;
     const { price } = items[index];
-
-    const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
     return price - Math.round(discount / 100 * Math.floor(price / totalPrice * 100))
   }
@@ -98,17 +87,19 @@ class App extends Component {
   }
 
   render() {
-    const { state, validateProduct, submitDiscount, renderDiscount, submitItem, setNewItemTitle, setNewItemPrice, changeDiscount } = this;
+    const { state, validateProduct, validateDiscount, submitDiscount, renderDiscount, submitItem, setNewItemTitle, setNewItemPrice, setDiscount } = this;
     const { newItemTitle, newItemPrice, newDiscount, items, discount } = state;
+    const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+    const discountIsValid = newDiscount >= totalPrice;
     const itemList = items.map((item, index) => {
       return (
         <tr key={index}>
           <td>{item.title}</td>
           <td>{item.price}</td>
-          <td>{renderDiscount(index)}</td>
+          <td>{renderDiscount(index, totalPrice)}</td>
         </tr>
       )
-    })
+    });
 
     return (
       <div className="app">
@@ -117,42 +108,40 @@ class App extends Component {
           <div className="col-wrapper">
             <div className="col">
               <h2 className="header">Добавить продукт</h2>
-              <div className="form">
-                <form action="/" onSubmit={submitItem}>
-                  <div className="input-item _big">
-                    <label>
-                      <div className="input-item__label">Продукт</div>
-                      <div className="input-item__wrapper">
-                        <input 
-                          type="text" 
-                          value={newItemTitle}
-                          onChange={setNewItemTitle}
-                        />
-                      </div>
-                    </label>
-                  </div>
-                  <div className="input-item">
-                    <label>
-                      <div className="input-item__label">Цена</div>
-                      <div className="input-item__wrapper">
-                        <input 
-                          type="text"
-                          value={newItemPrice}
-                          onChange={setNewItemPrice}
-                        />
-                      </div>
-                    </label>
-                  </div>
-                  <div className="input-item">
-                    <label>
-                      <div className="input-item__label"></div>
-                      <div className="input-item__wrapper">
-                        <button disabled={validateProduct()}>Добавить</button>
-                      </div>
-                    </label>
-                  </div>
-                </form>
-              </div>
+              <form action="/" onSubmit={submitItem}>
+                <div className="input-item">
+                  <label>
+                    <div className="input-item__label">Продукт</div>
+                    <div className="input-item__wrapper">
+                      <input 
+                        type="text" 
+                        value={newItemTitle}
+                        onChange={setNewItemTitle}
+                      />
+                    </div>
+                  </label>
+                </div>
+                <div className="input-item">
+                  <label>
+                    <div className="input-item__label">Цена</div>
+                    <div className="input-item__wrapper">
+                      <input 
+                        type="text"
+                        value={newItemPrice}
+                        onChange={setNewItemPrice}
+                      />
+                    </div>
+                  </label>
+                </div>
+                <div className="input-item">
+                  <label>
+                    <div className="input-item__label"></div>
+                    <div className="input-item__wrapper">
+                      <button disabled={validateProduct()}>Добавить</button>
+                    </div>
+                  </label>
+                </div>
+              </form>
             </div>
             <div className="col">
               <div className="tip">С помощью этой формы вы можете добавить товары в корзину</div>
@@ -164,42 +153,45 @@ class App extends Component {
             <div className="col-wrapper">
               <div className="col">
                 <h2 className="header">Корзина</h2>
-                <div className="table">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Продукт</th>
-                        <th>Цена</th>
-                        <th>Цена со скидкой</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itemList}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="form">
-                  <form action="/" onSubmit={submitDiscount}>
-                    <div className="input-item">
-                      <label>
-                        <span>Применить скидку</span>
-                        <input 
-                          type="text" 
-                          value={newDiscount}
-                          onChange={changeDiscount}
-                        />
-                        <span>рублей</span>
-                        <button>Применить</button>
-                      </label>
+                {items.length 
+                  ? (
+                    <div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Продукт</th>
+                            <th>Цена</th>
+                            <th>Цена со скидкой</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itemList}
+                        </tbody>
+                      </table>
+                      <form action="/" onSubmit={submitDiscount}>
+                        <div className="inline-input">
+                          <label>
+                            <span>Применить скидку</span>
+                            <input 
+                              type="text" 
+                              value={newDiscount}
+                              onChange={setDiscount}
+                            />
+                            <span>рублей</span>
+                          </label>
+                          <button disabled={discountIsValid}>Применить</button>
+                        </div>
+                      </form>
                     </div>
-                  </form>
-                </div>
+                  )
+                  : <div className="empty-cart">В корзине нет товаров</div>
+                }
               </div>
               <div className="col">
                 <div className="tip">Скидка для каждой позиции рассчитывается пропорционально цене товара. Скидка всегда в рублях без копеек. Сумма скидок по каждому товару всегда точно равна общей сумме. При округлении остаток суммы применяется к самому дорогому товару в корзине.</div>
               </div>
             </div>
-        </div>
+          </div>
         </div>
       </div>
     )
