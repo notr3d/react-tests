@@ -39,18 +39,26 @@ class App extends Component {
   }
 
   setNewItemPrice(event) {
+    const value = Number(event.target.value);
+
+    if (isNaN(value)) return false;
+
     this.setState({
-      newItemPrice: Number(event.target.value)
+      newItemPrice: value
     })
   }
 
   changeDiscount(event) {
+    const value = Number(event.target.value);
+
+    if (isNaN(value)) return false;
+
     this.setState({
-      newDiscount: Number(event.target.value)
+      newDiscount: value
     })
   }
 
-  handleSubmit = e => {
+  submitItem = e => {
     e.preventDefault();
 
     const { newItemTitle, newItemPrice, items } = this.state;
@@ -81,11 +89,16 @@ class App extends Component {
 
     const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
 
-    return Math.round(discount / 100 * Math.floor(price / totalPrice * 100))
+    return price - Math.round(discount / 100 * Math.floor(price / totalPrice * 100))
+  }
+
+  validateProduct = () => {
+    const { newItemTitle, newItemPrice } = this.state;
+    return !(newItemTitle && newItemPrice)
   }
 
   render() {
-    const { state, submitDiscount, renderDiscount, handleSubmit, setNewItemTitle, setNewItemPrice, changeDiscount } = this;
+    const { state, validateProduct, submitDiscount, renderDiscount, submitItem, setNewItemTitle, setNewItemPrice, changeDiscount } = this;
     const { newItemTitle, newItemPrice, newDiscount, items, discount } = state;
     const itemList = items.map((item, index) => {
       return (
@@ -105,7 +118,7 @@ class App extends Component {
             <div className="col">
               <h2 className="header">Добавить продукт</h2>
               <div className="form">
-                <form action="/" onSubmit={handleSubmit}>
+                <form action="/" onSubmit={submitItem}>
                   <div className="input-item _big">
                     <label>
                       <div className="input-item__label">Продукт</div>
@@ -134,7 +147,7 @@ class App extends Component {
                     <label>
                       <div className="input-item__label"></div>
                       <div className="input-item__wrapper">
-                        <button>Добавить</button>
+                        <button disabled={validateProduct()}>Добавить</button>
                       </div>
                     </label>
                   </div>
